@@ -17,10 +17,10 @@
         include('model/ConexaoBanco.class.php');
         include('model/Servicos.class.php');
 
-        $countFinalizado = '12';
-        $countAtendimento = '';
-        $countPendente = '';
-        $countEstourado = '';
+        $countFinalizado = Chamados::getContagem('finalizados');
+        $countAtendimento = Chamados::getContagem('atendimento');
+        $countPendente = Chamados::getContagem('pendentes');
+        $countEstourado = Chamados::getContagem('estourados');
     ?>    
 
     <div class="container">
