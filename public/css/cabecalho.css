@@ -1,0 +1,38 @@
+.navbar, .dropdown-menu{
+    border: none;
+    background: dodgerblue; 
+    background: -webkit-linear-gradient(rgb(88, 180, 253), rgb(5, 128, 183));
+    background: -o-linear-gradient(rgb(88, 180, 253), rgb(5, 128, 183));
+    background: -moz-linear-gradient(rgb(88, 180, 253), rgb(5, 128, 183));
+    background: linear-gradient(rgb(88, 180, 253), rgb(5, 128, 183));
+}
+
+.nav>li>a, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .dropdown-menu>li>a, .dropdown-menu>li{
+    border-bottom: 3px solid transparent;
+}
+.nav>li>a:focus, .nav>li>a:hover,.nav .open>a, .nav .open>a:focus, .nav .open>a:hover, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover{
+    border-bottom: 3px solid transparent;
+    background: none;
+}
+.navbar a, .dropdown-menu>li>a, .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover, .navbar-toggle{
+    color: #fff;
+}
+.dropdown-menu{
+    -webkit-box-shadow: none;
+    box-shadow:none;
+}
+
+#navbar .nav li:hover, #navbar .nav li.active{
+    background-color: #1288c2;
+}
+
+.navbar-toggle .icon-bar{
+    color: #fff;
+    background: #fff;
+}
+.navbar-brand {
+    float: left;
+    height: 50px;
+    padding: 2px 5px 0px 0px;
+    line-height: 20px;
+}
