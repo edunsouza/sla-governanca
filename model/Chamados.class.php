@@ -1,4 +1,6 @@
 <?php
+include_once('/ConexaoBanco.class.php');
+
 class Chamados {
 
     # PUBLIC

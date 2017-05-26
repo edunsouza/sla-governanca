@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset='UTF-8'/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <?php include_once('includes/libs.php'); ?>
     <!-- CSS CUSTOMIZADO -->
     <link rel="stylesheet" href="public/css/cabecalho.css">
     <link rel="stylesheet" href="public/css/index.css">
@@ -12,10 +9,8 @@
 
 <body>
     <?php
-        include('view/cabecalho.php');
-        include('model/Chamados.class.php');
-        include('model/ConexaoBanco.class.php');
-        include('model/Servicos.class.php');
+        include_once('view/cabecalho.php');
+        include_once('model/Chamados.class.php');
 
         $countFinalizado = Chamados::getContagem('finalizados');
         $countAtendimento = Chamados::getContagem('atendimento');
