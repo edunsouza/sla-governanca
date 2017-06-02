@@ -3,7 +3,6 @@
 <head>
     <?php include_once('includes/libs.php'); ?>
     <!-- CSS CUSTOMIZADO -->
-    <link rel="stylesheet" href="public/css/cabecalho.css">
     <link rel="stylesheet" href="public/css/index.css">
 </head>
 

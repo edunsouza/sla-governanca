@@ -1,4 +1,6 @@
 <?php
+include_once( $_SERVER['DOCUMENT_ROOT'] . "/sla_governanca/model/ConexaoBanco.class.php" );
+
 class Servicos {
     
     public static function getServicos() {

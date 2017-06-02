@@ -1,9 +1,9 @@
 <?php
-# SE USUÁRIO JÁ ESTIVER LOGADO, FICA NA SESSÃO
-if ( @$_SESSION['logado'] ) {
-    header("Location: /sla_governanca");
-    die();
-}
+    # SE USUÁRIO JÁ ESTIVER LOGADO, FICA NA SESSÃO
+    if ( @$_SESSION['logado'] ) {
+        header("Location: /sla_governanca");
+        die();
+    }
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +15,8 @@ if ( @$_SESSION['logado'] ) {
         $(document).ready(function(e) {
             // SUBMIT
             $("#submit").on('click', function(evt) {
-                var url = $(document).prop('URL').substring(0, $(document).prop('URL').indexOf('/', $(document).prop('origin').length + 1)) + '/controller/login.controller.php';
+                var url = '<?= getRootPath() . "/controller/login.controller.php" ?>';
+                $(this).addClass('disabled');
 
                 $.post(url, {usuario: $("#usuario").val(), senha: $("#senha").val() }).done(function(data){
                     var teste = JSON.parse(data);
@@ -23,8 +24,11 @@ if ( @$_SESSION['logado'] ) {
                     if (teste.sucesso) {
                         window.location.href = $(document).prop('URL').substring(0, $(document).prop('URL').indexOf('/', $(document).prop('origin').length + 1));
                         $("#submit").addClass('disabled');
+                        return;
                     }
 
+                    $("#submit").removeClass('disabled');
+                    alert('Usuário ou Senha inválidos');
                 });
 
             });

@@ -1,5 +1,5 @@
 <?php
-include_once('/ConexaoBanco.class.php');
+include_once( $_SERVER['DOCUMENT_ROOT'] . "/sla_governanca/model/ConexaoBanco.class.php" );
 
 class Chamados {
 
