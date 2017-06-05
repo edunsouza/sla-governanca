@@ -1,19 +1,37 @@
 <?php
-    include($_SERVER['DOCUMENT_ROOT'] . '/sla_governanca/model/Login.class.php');
+session_start();
+include_once($_SERVER['DOCUMENT_ROOT'] . '/sla_governanca/model/Login.class.php');
 
-    $usuario = @$_POST['usuario'];
-    $senha = @$_POST['senha'];
+if ( isset($_POST['acao']) ) {
+    
+    if ( $_POST['acao'] == 'logar' ) {
+        echo json_encode( logar() );
+    }
 
-    $id = Login::validar($usuario, $senha);
+}
+
+function logar() {
+    if ( isset($_SESSION['logado']) && $_SESSION['logado'] == true ) {
+        return array("sucesso" => false, "mensagem" => "Usuário já está logado");
+    }
+
+    if ( !isset($_POST['usuario']) ) {
+        return array("sucesso" => false, "mensagem" => "Usuário não informado"); 
+    }
+
+    $id = Login::validar( $_POST['usuario'] );
 
     $json['sucesso'] = $id !== false;
     $json['id'] = ($json['sucesso']) ? $id : false;
+    $json['mensagem'] = ($json['sucesso']) ? "Sucesso" : "Usuário inválido";
 
-    if ($json['sucesso'] && !@$_SESSION['logado']) {
-        session_start();
+    if ( !isset($_SESSION['logado']) ) {
         $_SESSION['logado'] = true;
         $_SESSION['userid'] = $id;
+        $_SESSION['username'] = mb_strtolower( Login::getNome($id), 'UTF-8' );
     }
 
-    echo json_encode($json);
+    return $json;
+}
+
 ?>

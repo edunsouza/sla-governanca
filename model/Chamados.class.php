@@ -5,22 +5,42 @@ class Chamados {
 
     # PUBLIC
 
-    public static function getContagem($tipo) {
-        switch ($tipo) {
+    public static function getContagem($status, $where = '') {
+        switch ($status) {
             case 'finalizados':
-                return self::getFinalizados(true)[0]['quantidade'];
+                return self::getFinalizados(true, $where)[0]['quantidade'];
                 break;
             
             case 'pendentes':
-                return self::getPendentes(true)[0]['quantidade'];
+                return self::getPendentes(true, $where)[0]['quantidade'];
                 break;
             
             case 'estourados':
-                return self::getEstourados(true)[0]['quantidade'];
+                return self::getEstourados(true, $where)[0]['quantidade'];
                 break;
             
             case 'atendimento':
-                return self::getAtendimento(true)[0]['quantidade'];
+                return self::getAtendimento(true, $where)[0]['quantidade'];
+                break;
+        }
+    }
+
+    public static function getPorStatus($status, $where = '') {
+        switch ($status) {
+            case 'finalizados':
+                return self::getFinalizados(false, $where);
+                break;
+            
+            case 'pendentes':
+                return self::getPendentes(false, $where);
+                break;
+            
+            case 'estourados':
+                return self::getEstourados(false, $where);
+                break;
+            
+            case 'atendimento':
+                return self::getAtendimento(false, $where);
                 break;
         }
     }
@@ -38,105 +58,135 @@ class Chamados {
                                     FROM chamados
                                     JOIN servicos ON servicos.id = chamados.idservico
                                     JOIN usuarios ON usuarios.id = chamados.usuarioabertura
-                                    LEFT JOIN usuarios usu2 ON usuarios.id = chamados.usuarioencerramento" );
+                                    LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento" );
     }
 
 
     # PRIVATE
 
-    private static function getFinalizados($contar = false) {
-       $campos = " chamados.descricao,
+    private static function getFinalizados($contar = false, $where = '') {
+        $campos = " chamados.descricao AS descricao,
+                   setores.titulo AS setor,
                    servicos.descricao AS servico,
                    servicos.sla AS sla,
-                   usuarios.nome AS usuarioabertura,
-                   usu2.nome AS usuarioencerramento,
-                   chamados.status,
-                   chamados.abertura,
-                   chamados.fechamento ";
+                   categorias.titulo AS categoria,
+                   usuarios.nome AS solicitante,
+                   usu2.nome AS responsavel,
+                   'FINALIZADO' AS status,
+                   chamados.abertura AS abertura,
+                   chamados.fechamento AS fechamento,
+                   HOUR(TIMEDIFF(COALESCE(chamados.fechamento, NOW()), chamados.abertura)) AS tempoaberto,
+                   IF(HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla <= 0,
+                       'Dentro do SLA',
+                       CONCAT(FLOOR((HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla) / 24), ' dias')
+                   ) AS tempoestourado";
 
         if ($contar)
             $campos = " COUNT(*) AS quantidade ";
 
-        return ConexaoBanco::query("SELECT
-                                        {$campos}
+        return ConexaoBanco::query("SELECT {$campos}
                                     FROM chamados
                                     JOIN servicos ON servicos.id = chamados.idservico
                                     JOIN usuarios ON usuarios.id = chamados.usuarioabertura
-                                    LEFT JOIN usuarios usu2 ON usuarios.id = chamados.usuarioencerramento
-                                    WHERE chamados.status = 'F'" );
+                                    LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento
+                                    JOIN setores ON setores.id = servicos.setorresponsavel
+                                    JOIN categorias ON categorias.id = servicos.idcategoria
+                                    WHERE chamados.status = 'F'
+                                    $where");
     }
 
-    private static function getPendentes($contar = false) {
-        $campos = " chamados.descricao,
+    private static function getPendentes($contar = false, $where = '') {
+        $campos = " chamados.descricao AS descricao,
+                    setores.titulo AS setor,
                     servicos.descricao AS servico,
-                    servicos.sla AS sla
-                    usuarios.nome AS usuarioabertura,
-                    usu2.nome AS usuarioencerramento,
-                    chamados.status,
-                    chamados.abertura,
-                    chamados.fechamento ";
-        
+                    servicos.sla AS sla,
+                    categorias.titulo AS categoria,
+                    usuarios.nome AS solicitante,
+                    usu2.nome AS responsavel,
+                    'PENDENTE' AS status,
+                    chamados.abertura AS abertura,
+                    chamados.fechamento AS fechamento,
+                    HOUR(TIMEDIFF(COALESCE(chamados.fechamento, NOW()), chamados.abertura)) AS tempoaberto,
+                    IF(HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla <= 0,
+                        'Dentro do SLA',
+                        CONCAT(FLOOR((HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla) / 24), ' dias')
+                    ) AS tempoestourado";
+
         if ($contar)
             $campos = " COUNT(*) AS quantidade ";
 
-        return ConexaoBanco::query("SELECT
-                                        {$campos} 
+        return ConexaoBanco::query("SELECT {$campos} 
                                     FROM chamados
                                     JOIN servicos ON servicos.id = chamados.idservico
                                     JOIN usuarios ON usuarios.id = chamados.usuarioabertura
-                                    LEFT JOIN usuarios usu2 ON usuarios.id = chamados.usuarioencerramento
-                                    WHERE chamados.status = 'P'");
+                                    LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento
+                                    JOIN setores ON setores.id = servicos.setorresponsavel
+                                    JOIN categorias ON categorias.id = servicos.idcategoria
+                                    WHERE chamados.status = 'P'
+                                    $where");
     }
 
-    private static function getEstourados($contar = false) {
-        $campos = " chamados.descricao,
+    private static function getEstourados($contar = false, $where = '') {
+        $campos = " chamados.descricao AS descricao,
+                    setores.titulo AS setor,
+                    servicos.descricao AS servico,
+                    servicos.sla AS sla,
                     categorias.titulo AS categoria,
+                    usuarios.nome AS solicitante,
+                    usu2.nome AS responsavel,
                     IF(chamados.status = 'P', 'PENDENTE',
                         IF(chamados.status = 'A', 'EM ATENDIMENTO',
                             IF(chamados.status = 'F', 'FINALIZADO', 'SEM STATUS')
                         )
                     ) AS status,
-                    usuarios.nome AS solicitante,
-                    usu2.nome AS responsavel,
-                    servicos.sla AS slaoriginal,
-                    HOUR(TIMEDIFF(NOW(), chamados.abertura)) AS tempoaberto,
-                    (HOUR(TIMEDIFF(NOW(), chamados.abertura)) - servicos.sla) AS tempoestourado ";
+                    chamados.abertura AS abertura,
+                    chamados.fechamento AS fechamento,
+                    HOUR(TIMEDIFF(COALESCE(chamados.fechamento, NOW()), chamados.abertura)) AS tempoaberto,
+                    CONCAT(FLOOR((HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla) / 24), ' dias') AS tempoestourado";
         
         if ($contar)
             $campos = " COUNT(*) AS quantidade ";
 
-        return ConexaoBanco::query("SELECT
-                                        {$campos}
-                                    FROM
-                                        chamados
-                                            JOIN servicos ON servicos.id = chamados.idservico
-                                            LEFT JOIN usuarios ON usuarios.id = chamados.usuarioabertura
-                                            LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento
-                                            JOIN categorias ON categorias.id = servicos.idcategoria
-                                    WHERE
-                                        ( HOUR(TIMEDIFF( NOW(), chamados.abertura) ) > servicos.sla )");
+        return ConexaoBanco::query("SELECT {$campos}
+                                    FROM chamados
+                                    JOIN servicos ON servicos.id = chamados.idservico
+                                    JOIN usuarios ON usuarios.id = chamados.usuarioabertura
+                                    LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento
+                                    JOIN setores ON setores.id = servicos.setorresponsavel
+                                    JOIN categorias ON categorias.id = servicos.idcategoria
+                                    WHERE (HOUR(TIMEDIFF(COALESCE(chamados.fechamento, NOW()), chamados.abertura)) > servicos.sla)
+                                    $where");
     }
 
-    private static function getAtendimento($contar = false) {
-        $campos = " chamados.descricao,
+    private static function getAtendimento($contar = false, $where = '') {
+        $campos = " chamados.descricao AS descricao,
+                    setores.titulo AS setor,
                     servicos.descricao AS servico,
                     servicos.sla AS sla,
-                    usuarios.nome AS usuarioabertura,
-                    usu2.nome AS usuarioencerramento,
-                    chamados.status,
-                    chamados.abertura,
-                    chamados.fechamento ";
+                    categorias.titulo AS categoria,
+                    usuarios.nome AS solicitante,
+                    usu2.nome AS responsavel,
+                    'EM ATENDIMENTO' AS status,
+                    chamados.abertura AS abertura,
+                    chamados.fechamento AS fechamento,
+                    HOUR(TIMEDIFF(COALESCE(chamados.fechamento, NOW()), chamados.abertura)) AS tempoaberto,
+                    IF(HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla <= 0,
+                        'Dentro do SLA',
+                        CONCAT( FLOOR( (HOUR(TIMEDIFF(COALESCE(fechamento, NOW()), abertura)) - sla) / 24), ' dias')
+                    ) AS tempoestourado";
 
         if ($contar)
             $campos = " COUNT(*) AS quantidade ";
 
-        return ConexaoBanco::query("SELECT
-                                        {$campos}
+        return ConexaoBanco::query("SELECT {$campos}
                                     FROM chamados
                                     JOIN servicos ON servicos.id = chamados.idservico
                                     JOIN usuarios ON usuarios.id = chamados.usuarioabertura
-                                    LEFT JOIN usuarios usu2 ON usuarios.id = chamados.usuarioencerramento
-                                    WHERE chamados.status = 'A'");
+                                    LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento
+                                    JOIN setores ON setores.id = servicos.setorresponsavel
+                                    JOIN categorias ON categorias.id = servicos.idcategoria
+                                    WHERE chamados.status = 'A'
+                                    $where");
     }
 
 }

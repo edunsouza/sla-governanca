@@ -117,6 +117,6 @@ INSERT INTO servicos (id, idcategoria, descricao, setorresponsavel, permissaoabe
 
 INSERT INTO chamados (id, descricao, idservico, usuarioabertura, usuarioencerramento, status, abertura, fechamento) VALUES
 (1, 'PRECISO DE ALTERAÇÃO DE SENHA', 1, 1, NULL, 'P', '2017-05-19 16:05:00', NULL),
-(2, 'MEU COMPUTADOR ESTRAGOU', 2, 1, NULL, 'F', '2017-05-23 12:15:00', '2017-05-24 16:42:00'),
+(2, 'MEU COMPUTADOR ESTRAGOU', 2, 1, 4, 'F', '2017-05-23 12:15:00', '2017-05-24 16:42:00'),
 (3, 'SOLICITO CRACHÁ NOVO, O MEU ESTÁ NA CAPA DA GAITA', 4, 4, NULL, 'A', '2017-05-18 12:01:03', NULL),
 (4, 'MEU S.O TÁ LENTO, FORMATA PRA MIM', 3, 3, NULL, 'P', '2017-05-25 11:15:00', NULL);
