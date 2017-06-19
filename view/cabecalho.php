@@ -9,7 +9,7 @@
                                 <img class="navbar-brand" src="<?= getRootPath() . '/public/img/logo.png' ?>" alt="logo">
                             </a>
                         </div>
-                        <li><a href="#">Solicitar serviço</a></li>
+                        <li><a href="<?= getRootPath() . '/view/abrirchamado.php' ?>">Solicitar serviço</a></li>
                         <li><a href="#">Meus chamados</a></li>
                         <li><a href="#">Caixa de entrada</a></li>
                     </ul>

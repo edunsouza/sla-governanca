@@ -1,5 +1,6 @@
 <?php
 include_once( $_SERVER['DOCUMENT_ROOT'] . "/sla_governanca/model/ConexaoBanco.class.php" );
+include_once( $_SERVER['DOCUMENT_ROOT'] . "/sla_governanca/includes/helper.php" );
 
 class Chamados {
 
@@ -61,6 +62,12 @@ class Chamados {
                                     LEFT JOIN usuarios usu2 ON usu2.id = chamados.usuarioencerramento" );
     }
 
+
+    public static function cadastrar($dados) {
+        return ConexaoBanco::query("INSERT INTO chamados (descricao, idservico, usuarioabertura, status, abertura)
+                                    VALUES ( '{$dados['descricao']}', {$dados['idservico']}, '{$dados['usuarioabertura']}',
+                                    'P',  NOW() )");
+    }
 
     # PRIVATE
 

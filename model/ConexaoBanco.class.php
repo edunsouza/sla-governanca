@@ -17,7 +17,7 @@ class ConexaoBanco {
         if ($resultSet) {
             $rows = [];
 
-            while($row = $resultSet->fetch_assoc()) {
+            while($row = @$resultSet->fetch_assoc()) {
                 $rows[] = $row;
             }
 

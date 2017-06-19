@@ -50,3 +50,6 @@
 .table>tbody>tr>td {
     border: none;
 }
+.label-form {
+    font-size: 20px;
+}

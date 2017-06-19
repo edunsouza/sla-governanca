@@ -20,12 +20,20 @@ class Servicos {
                                             JOIN permissoes ON permissoes.id = permissaoabertura");
     }
 
+    public static function getDados($id) {
+        return ConexaoBanco::query( "SELECT sla, prioridade FROM servicos WHERE id = $id");
+    }
+
+    public static function getDescricao() {
+        return ConexaoBanco::query( "SELECT id, descricao FROM servicos");
+    }
+
     public static function getCategorias() {
-        return ConexaoBanco::query( "SELECT titulo AS categoria FROM categorias" );
+        return ConexaoBanco::query( "SELECT id, titulo AS categoria FROM categorias" );
     }
 
     public static function getSetores() {
-        return ConexaoBanco::query( "SELECT setores.titulo AS setor FROM setores" );
+        return ConexaoBanco::query( "SELECT id, titulo AS setor FROM setores" );
     }
 
     public static function getUsuarios() {
